@@ -1,0 +1,29 @@
+.hud {
+  font-family: monospace;
+  padding: 1rem;
+  background: #111;
+  color: #ccc;
+  min-height: 100vh;
+}
+
+h1 {
+  color: #f90;
+  margin: 0 0 0.5rem;
+}
+
+strong {
+  color: #f33;
+}
+strong.online {
+  color: #3f3;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+li {
+  border-bottom: 1px solid #333;
+  padding: 0.2rem 0;
+}

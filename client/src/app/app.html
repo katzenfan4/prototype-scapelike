@@ -1,0 +1,12 @@
+<div class="hud">
+  <h1>Scapelike</h1>
+  <p>
+    Server:
+    <strong [class.online]="game.connected">{{
+      game.connected ? 'Connected' : 'Disconnected'
+    }}</strong>
+  </p>
+  <ul *ngIf="messages.length > 0">
+    <li *ngFor="let m of messages">{{ m }}</li>
+  </ul>
+</div>
