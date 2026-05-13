@@ -46,7 +46,7 @@ public class Database {
     }
 
     private static String env(String key, String fallback) {
-        String val = System.getenv(key);
-        return val != null ? val : fallback;
+        String value = System.getenv(key);
+        return value != null ? value : fallback;
     }
 }
