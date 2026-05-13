@@ -12,7 +12,7 @@ public class Main {
         Database db = new Database();
         GameServer server = new GameServer(db);
 
-        tickEngine.start();
+        tickEngine.start(server::broadcastTick);
         server.start();
     }
 }
