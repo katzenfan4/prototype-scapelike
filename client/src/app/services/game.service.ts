@@ -22,11 +22,14 @@ export class GameService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username }),
     });
+    if (!response.ok) {
+      throw new Error(`Login failed: ${response.status}`);
+    }
     const data = (await response.json()) as { token: string };
     this.connect(`${wsBaseUrl}?token=${data.token}`);
   }
 
-  public connect(url: string): void {
+  private connect(url: string): void {
     this.socket = new WebSocket(url);
     this.socket.onopen = () => (this.connected = true);
     this.socket.onclose = () => (this.connected = false);

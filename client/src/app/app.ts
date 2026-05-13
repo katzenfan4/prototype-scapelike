@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { GameService, SessionInfo } from './services/game.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -28,13 +27,17 @@ export class App implements OnInit, OnDestroy {
       this.tickSeq = seq;
       this.tickCount++;
     });
-    this.sessionSub = this.game.sessionInfo$.subscribe((info) => (this.sessionInfo = info));
+    this.sessionSub = this.game.sessionInfo$.subscribe((session) => (this.sessionInfo = session));
   }
 
   public async onLogin(username: string): Promise<void> {
     if (!username.trim()) return;
-    await this.game.login(username.trim());
-    this.loggedIn = true;
+    try {
+      await this.game.login(username.trim());
+      this.loggedIn = true;
+    } catch (e) {
+      console.error('Login failed', e);
+    }
   }
 
   ngOnDestroy(): void {
