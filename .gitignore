@@ -22,3 +22,6 @@ client/.angular/
 .idea/
 *.iml
 .vscode/
+
+# Local stuff
+.claude/settings.local.json
