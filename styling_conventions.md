@@ -221,12 +221,24 @@ ngOnDestroy(): void {
 ```html
 [prop]="expr"           <!-- property binding -->
 (event)="handler()"     <!-- event binding -->
-*ngIf="condition"       <!-- structural directive -->
-*ngFor="let x of xs"    <!-- structural directive -->
 {{ expr }}              <!-- interpolation -->
 [class.active]="bool"   <!-- conditional class -->
+
+@if (condition) {
+  ...
+} @else {
+  ...
+}
+
+@for (item of items; track item.id) {
+  ...
+} @empty {
+  <p>No items.</p>
+}
 ```
 
+- Use Angular's built-in control flow (`@if`, `@for`, `@switch`, `@defer`) — never the deprecated structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`).
+- `@for` requires a `track` expression — use a unique identifier (e.g. `track item.id`), never `track $index` unless no stable id exists.
 - Ternary expressions are OK for simple conditions inside interpolation.
 - Avoid complex logic in templates — move it to the component class.
 
