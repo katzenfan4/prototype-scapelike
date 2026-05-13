@@ -4,13 +4,16 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Database {
     private static final Logger log = LoggerFactory.getLogger(Database.class);
     private final HikariDataSource pool;
+    private final DSLContext dsl;
 
     public Database() {
         HikariConfig config = new HikariConfig();
@@ -21,24 +24,17 @@ public class Database {
         config.setPassword(env("DB_PASS", "scapelike"));
         config.setMaximumPoolSize(10);
         this.pool = new HikariDataSource(config);
+        this.dsl = DSL.using(pool, SQLDialect.MARIADB);
         migrate();
         log.info("Database connected");
     }
 
     private void migrate() {
-        try (Connection conn = pool.getConnection();
-                Statement stmt = conn.createStatement()) {
-            stmt.execute(
-                    """
-                CREATE TABLE IF NOT EXISTS players (
-                    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-                    username   VARCHAR(32) NOT NULL UNIQUE,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-                """);
-        } catch (SQLException e) {
-            throw new RuntimeException("Migration failed", e);
-        }
+        // TODO: add schema migrations
+    }
+
+    public DSLContext dsl() {
+        return dsl;
     }
 
     public Connection getConnection() throws SQLException {
