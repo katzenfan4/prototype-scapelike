@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 public class GameServer {
     private static final Logger log = LoggerFactory.getLogger(GameServer.class);
 
+    // TODO: inject into message handlers
     private final Database db;
     private final Map<String, WsContext> sessions = new ConcurrentHashMap<>();
 
@@ -19,27 +20,33 @@ public class GameServer {
     }
 
     public void start() {
+        int port = Integer.parseInt(env("PORT", "7070"));
         Javalin app = Javalin.create(
                 config -> config.bundledPlugins.enableCors(cors -> cors.addRule(rule -> rule.anyHost())));
 
         app.get("/health", ctx -> ctx.result("OK"));
 
-        app.ws("/ws/game", ws -> {
-            ws.onConnect(ctx -> {
+        app.ws("/ws/game", wsConfig -> {
+            wsConfig.onConnect(ctx -> {
                 sessions.put(ctx.sessionId(), ctx);
                 log.info("Client connected: {}", ctx.sessionId());
             });
-            ws.onMessage(ctx -> {
+            wsConfig.onMessage(ctx -> {
                 log.debug("Message [{}]: {}", ctx.sessionId(), ctx.message());
                 // TODO: route messages to game logic
             });
-            ws.onClose(ctx -> {
+            wsConfig.onClose(ctx -> {
                 sessions.remove(ctx.sessionId());
                 log.info("Client disconnected: {}", ctx.sessionId());
             });
         });
 
-        app.start(7070);
-        log.info("Game server listening on :7070");
+        app.start(port);
+        log.info("Game server listening on :{}", port);
+    }
+
+    private static String env(String key, String fallback) {
+        String value = System.getenv(key);
+        return value != null ? value : fallback;
     }
 }
