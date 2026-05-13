@@ -1,9 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { GameService } from './services/game.service';
-
-const wsUrl = 'ws://localhost:7070/ws/game';
+import { GameService, SessionInfo } from './services/game.service';
 
 @Component({
   selector: 'app-root',
@@ -13,17 +11,36 @@ const wsUrl = 'ws://localhost:7070/ws/game';
 })
 export class App implements OnInit, OnDestroy {
   public messages: string[] = [];
+  public loggedIn: boolean = false;
+  public tickSeq: number = 0;
+  public tickCount: number = 0;
+  public sessionInfo: SessionInfo | null = null;
+
   private messageSub!: Subscription;
+  private tickSub!: Subscription;
+  private sessionSub!: Subscription;
 
   constructor(public readonly game: GameService) {}
 
   ngOnInit(): void {
     this.messageSub = this.game.messages$.subscribe((msg) => this.messages.push(msg));
-    this.game.connect(wsUrl);
+    this.tickSub = this.game.tick$.subscribe((seq) => {
+      this.tickSeq = seq;
+      this.tickCount++;
+    });
+    this.sessionSub = this.game.sessionInfo$.subscribe((info) => (this.sessionInfo = info));
+  }
+
+  public async onLogin(username: string): Promise<void> {
+    if (!username.trim()) return;
+    await this.game.login(username.trim());
+    this.loggedIn = true;
   }
 
   ngOnDestroy(): void {
     this.messageSub.unsubscribe();
+    this.tickSub.unsubscribe();
+    this.sessionSub.unsubscribe();
     this.game.disconnect();
   }
 }
