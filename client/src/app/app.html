@@ -1,12 +1,46 @@
 <div class="hud">
   <h1>Scapelike</h1>
-  <p>
-    Server:
-    <strong [class.online]="game.connected">{{
-      game.connected ? 'Connected' : 'Disconnected'
-    }}</strong>
-  </p>
-  <ul *ngIf="messages.length > 0">
-    <li *ngFor="let msg of messages">{{ msg }}</li>
-  </ul>
+
+  @if (!loggedIn) {
+    <div>
+      <input
+        #usernameInput
+        placeholder="Enter username"
+        (keydown.enter)="onLogin(usernameInput.value)"
+      />
+      <button (click)="onLogin(usernameInput.value)">Enter</button>
+    </div>
+  }
+
+  @if (loggedIn) {
+    <div>
+      <p>
+        Server:
+        <strong [class.online]="game.connected">{{
+          game.connected ? 'Connected' : 'Disconnected'
+        }}</strong>
+      </p>
+
+      <details open>
+        <summary>Session</summary>
+        <pre>playerId: {{ sessionInfo?.playerId ?? '...' }}</pre>
+      </details>
+
+      <details open>
+        <summary>Tick</summary>
+        <pre>
+seq:   {{ tickSeq }}
+count: {{ tickCount }}</pre
+        >
+      </details>
+
+      @if (messages.length > 0) {
+        <ul>
+          @for (msg of messages; track $index) {
+            <li>{{ msg }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
 </div>

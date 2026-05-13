@@ -17,6 +17,8 @@ services:
       start_period: 10s
     networks:
       - game_net
+    ports:
+      - "3306:3306"
 
   server:
     build:
