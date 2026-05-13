@@ -2,10 +2,16 @@ package com.scapelike.db;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.RenderNameCase;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +30,29 @@ public class Database {
         config.setPassword(env("DB_PASS", "scapelike"));
         config.setMaximumPoolSize(10);
         this.pool = new HikariDataSource(config);
-        this.dsl = DSL.using(pool, SQLDialect.MARIADB);
+        this.dsl = DSL.using(pool, SQLDialect.MARIADB, new Settings().withRenderNameCase(RenderNameCase.LOWER));
         migrate();
         log.info("Database connected");
     }
 
     private void migrate() {
-        // TODO: add schema migrations
+        try (InputStream stream = getClass().getResourceAsStream("/schema.sql")) {
+            if (stream == null) {
+                throw new RuntimeException("schema.sql not found on classpath");
+            }
+            String sql = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            try (Connection conn = pool.getConnection();
+                    Statement stmt = conn.createStatement()) {
+                for (String statement : sql.split(";")) {
+                    String trimmed = statement.strip();
+                    if (!trimmed.isEmpty()) {
+                        stmt.execute(trimmed);
+                    }
+                }
+            }
+        } catch (IOException | SQLException e) {
+            throw new RuntimeException("Migration failed", e);
+        }
     }
 
     public DSLContext dsl() {
