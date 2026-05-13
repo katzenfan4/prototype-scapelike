@@ -1,24 +1,28 @@
-# Compiled class file
+# Java
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
-*.nar
 *.ear
+*.nar
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+.mtj.tmp/
+server/target/
+dependency-reduced-pom.xml
+
+# Node / Angular
+node_modules/
+client/dist/
+client/.angular/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Local stuff
+.claude/settings.local.json

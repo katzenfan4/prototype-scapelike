@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "format": "npm run format --prefix client && mvn -f server/pom.xml spotless:apply -q",
+    "deploy": "docker-compose up --build -d",
+    "redeploy": "docker-compose down && docker-compose up --build -d",
+    "stop": "docker-compose down",
+    "logs": "docker-compose logs -f"
+  }
+}
