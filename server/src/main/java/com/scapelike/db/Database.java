@@ -43,6 +43,7 @@ public class Database {
             String sql = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
             try (Connection conn = pool.getConnection();
                     Statement stmt = conn.createStatement()) {
+                // TODO: replace with a proper parser when migrations include semicolons in string literals
                 for (String statement : sql.split(";")) {
                     String trimmed = statement.strip();
                     if (!trimmed.isEmpty()) {

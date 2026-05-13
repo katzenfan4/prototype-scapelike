@@ -14,10 +14,13 @@ public class TickEngine {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final AtomicLong tickCount = new AtomicLong(0);
+    private volatile boolean started = false;
     private LongConsumer onTick = seq -> {};
 
     public void start(LongConsumer onTick) {
+        if (started) throw new IllegalStateException("TickEngine already started");
         this.onTick = onTick;
+        started = true;
         scheduler.scheduleAtFixedRate(this::tick, 0, TICK_MS, TimeUnit.MILLISECONDS);
         log.info("Tick engine started ({} ms interval)", TICK_MS);
     }

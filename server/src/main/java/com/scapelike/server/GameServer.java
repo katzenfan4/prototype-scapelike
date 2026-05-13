@@ -77,8 +77,8 @@ public class GameServer {
                 Long playerId = sessionToPlayer.remove(ctx.sessionId());
                 if (playerId != null) {
                     connectedPlayers.remove(playerId);
+                    log.info("Player {} disconnected", playerId);
                 }
-                log.info("Player {} disconnected", playerId);
             });
         });
 
@@ -100,17 +100,26 @@ public class GameServer {
                 .returning(PLAYER.ID)
                 .fetchOne();
 
-        return created.getId();
+        if (created != null) {
+            return created.getId();
+        }
+
+        // Concurrent insert beat us — re-fetch
+        return db.dsl()
+                .selectFrom(PLAYER)
+                .where(PLAYER.USERNAME.eq(username))
+                .fetchOne()
+                .getId();
     }
 
     private Long validateToken(String token) {
-        var record = db.dsl()
+        var sessionRecord = db.dsl()
                 .selectFrom(PLAYER_SESSION)
                 .where(PLAYER_SESSION.TOKEN.eq(token))
                 .and(PLAYER_SESSION.EXPIRES_AT.gt(LocalDateTime.now()))
                 .fetchOne();
 
-        return record == null ? null : record.getPlayerId();
+        return sessionRecord == null ? null : sessionRecord.getPlayerId();
     }
 
     public void broadcastTick(long seq) {
