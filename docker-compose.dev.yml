@@ -1,0 +1,46 @@
+services:
+  mariadb:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: scapelike
+      MYSQL_USER: scapelike
+      MYSQL_PASSWORD: scapelike
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - game_net
+
+  server:
+    build:
+      context: ./server
+      args:
+        SKIP_TESTS: ${SKIP_TESTS:-true}
+    restart: unless-stopped
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: scapelike
+      DB_USER: scapelike
+      DB_PASS: scapelike
+    ports:
+      - "7070:7070"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - game_net
+
+networks:
+  game_net:
+    driver: bridge
+
+volumes:
+  mariadb_data:
