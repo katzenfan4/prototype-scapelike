@@ -12,6 +12,14 @@ docker-compose up --build
 - Server: http://localhost:7070
 - MariaDB: localhost:3306 (user/pass: `scapelike/scapelike`)
 
+### Backend only (Docker) + frontend local dev
+```
+docker-compose -f docker-compose.dev.yml up --build -d
+cd client && ng serve
+```
+- Client (hot reload): http://localhost:4200
+- Server: http://localhost:7070
+
 ### Server (local dev — requires local MariaDB)
 ```
 cd server
