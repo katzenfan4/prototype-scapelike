@@ -13,17 +13,17 @@ const wsUrl = 'ws://localhost:7070/ws/game';
 })
 export class App implements OnInit, OnDestroy {
   public messages: string[] = [];
-  private sub!: Subscription;
+  private messageSub!: Subscription;
 
   constructor(public readonly game: GameService) {}
 
   ngOnInit(): void {
-    this.sub = this.game.messages$.subscribe((msg) => this.messages.push(msg));
+    this.messageSub = this.game.messages$.subscribe((msg) => this.messages.push(msg));
     this.game.connect(wsUrl);
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.messageSub.unsubscribe();
     this.game.disconnect();
   }
 }
