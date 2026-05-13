@@ -26,3 +26,4 @@ client/.angular/
 
 # Local stuff
 .claude/settings.local.json
+/scapelike
